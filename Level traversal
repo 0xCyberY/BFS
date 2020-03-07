@@ -1,0 +1,142 @@
+#include<stdio.h>
+#include<stddef.h>
+#include<stdlib.h>
+struct bstnode{
+  struct bstnode *lc;
+  int data;
+  struct bstnode *rc;
+};
+struct sllnode{
+    struct bstnode *data;
+    struct sllnode *next;
+};
+void create(struct bstnode **r,int data);
+void preorder(struct bstnode *root);
+int isempty(struct sllnode *head,struct sllnode *last);
+void deque(struct sllnode **h,struct sllnode **l,struct bstnode **data);
+void enque(struct sllnode **h, struct sllnode **l,struct bstnode *data );
+int main(void)
+{
+    struct sllnode *head=NULL;
+    struct bstnode *temp=NULL;
+    struct sllnode *last =NULL;
+    struct bstnode *root =NULL;
+    int n =0;
+    int data =0;
+    printf("Enter no of nodes:\n");
+    scanf("%d",&n);
+    while(n>0)
+    {
+        printf("Enter data:\n");
+        scanf("%d",&data);
+        create(&root,data);
+        n--;
+    }
+    
+    printf("Preorder traversal:\n");
+    preorder(root);
+    
+    printf("\n\nLevel Order Traversal:\n");
+    if(root!=NULL)
+    {
+        enque(&head,&last,root);
+        while(isempty(head,last)==0)
+        {
+            deque(&head,&last,&temp);
+            printf("%d\t",temp->data);
+            if(temp->lc!=NULL)
+            {
+                enque(&head,&last,temp->lc);
+            }
+            if(temp->rc!=NULL)
+            {
+                enque(&head,&last,temp->rc);
+            }
+        }
+    }
+    return 0;
+}
+void create(struct bstnode **r,int data)
+{
+    struct bstnode *root=NULL;
+    root=*r;
+    if(root==NULL)
+    {
+        root=(struct bstnode *)calloc(sizeof(struct bstnode),1);
+        root->data=data;
+    }
+    else
+    {
+        if(root->data<data)
+        {
+            create(&root->rc,data);
+        }
+        else
+        {
+            create(&root->lc,data);
+        }
+    }
+    *r=root;
+}
+void preorder(struct bstnode *root)
+{
+    if(root!=NULL)
+    {
+        printf("%d\t",root->data);
+        preorder(root->lc);
+        preorder(root->rc);
+    }
+}
+int isempty(struct sllnode *head,struct sllnode *last)
+{
+    int x=0;
+    if(head==NULL)
+    {
+        x=1;
+    }
+    else
+    {
+        x=0;
+    }
+    return x;
+}
+void enque(struct sllnode **h, struct sllnode **l,struct bstnode *data )
+{
+    struct sllnode *head=NULL;
+    struct sllnode *last=NULL;
+    head=*h;
+    last=*l;
+    struct sllnode *newnode=NULL;
+    newnode=(struct sllnode*)calloc (sizeof(struct sllnode),1);
+    if(head==NULL)
+    {
+        head=newnode;
+        last=newnode;
+    }
+    else
+    {
+        last->next=newnode;
+        last=newnode;
+    }
+    *h=head;
+    *l=last;
+}
+void deque(struct sllnode **h,struct sllnode **l,struct bstnode **data)
+{
+    struct sllnode *head=NULL;
+    struct sllnode *last=NULL ;
+    struct sllnode *dnode=NULL;
+    head=*h;
+    last=*l;
+    if(!isempty(head,last))
+    {
+        dnode=head;
+        head=head->next;
+        *data=dnode->data;
+        dnode->next=NULL;
+        free(dnode);
+        dnode=NULL;
+    }
+    *l=last;
+    *h=head;
+}
